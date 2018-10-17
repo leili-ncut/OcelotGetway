@@ -1,0 +1,145 @@
+﻿{
+  "ReRoutes": [
+    {
+      "DownstreamPathTemplate": "/api/values/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 64038
+        }
+      ],
+      "UpstreamPathTemplate": "/webapib/values/{id}",
+      "UpstreamHttpMethod": [ "Get" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/values",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 64038
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "TestKey",
+        "AllowedScopes": []
+      },
+      "UpstreamPathTemplate": "/webapib/values",
+      "UpstreamHttpMethod": [ "Get" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/user/sex",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 64038
+        }
+      ],
+      "UpstreamPathTemplate": "/sex",
+      "UpstreamHttpMethod": [ "Get" ],
+      "Key": "sex"
+    },
+    {
+      "DownstreamPathTemplate": "/api/user/age",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 64038
+        }
+      ],
+      "UpstreamPathTemplate": "/age",
+      "UpstreamHttpMethod": [ "Get" ],
+      "Key": "age"
+
+    },
+    {
+      "DownstreamPathTemplate": "/api/auth",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5000
+        }
+      ],
+      "UpstreamPathTemplate": "/token",
+      "UpstreamHttpMethod": [ "Get" ]
+
+    },
+    {
+      "DownstreamPathTemplate": "/api/user/auth",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 64038
+        }
+      ],
+      "UpstreamPathTemplate": "/auth",
+      "UpstreamHttpMethod": [ "Get" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "TestKey",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/user/discovery",
+      "DownstreamScheme": "http",
+      "UpstreamPathTemplate": "/discovery",
+      "UpstreamHttpMethod": [ "Get" ],
+      "ServiceName": "MySampleApi",
+      "LoadBalancer": "RoundRobin",
+      "UseServiceDiscovery": true,
+      //限流
+      "RateLimitOptions": {
+        "ClientWhitelist": [], //This is an array that contains the whitelist of the client. It means that the client in this array will not be affected by the rate limiting.
+        "EnableRateLimiting": true, // This value specifies enable endpoint rate limiting.
+        "Period": "1s", // This value specifies the period, such as 1s, 5m, 1h,1d and so on.
+        "PeriodTimespan": 1, //This value specifies that we can retry after a certain number of seconds.
+        "Limit": 1 // This value specifies the maximum number of requests that a client can make in a defined period.
+      },
+      // 熔断
+      "QoSOptions": {
+        "ExceptionsAllowedBeforeBreaking": 2, // This value must greater than 0. It means that the circuit breaker will break after a certain number of exceptions occur.
+        "DurationOfBreak": 5000, // This value specifies how long the circuit breaker will stay open after it is tripped. The unit of this value is milliseconds.
+        "TimeoutValue": 2000 // This value specifies that a request will automatically be timed out if it takes more than this value. The unit of this value is milliseconds as well.
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/coredata/api/Stock/GetBaseInfo",
+      "DownstreamScheme": "http",
+      "UpstreamPathTemplate": "/ent/iims/v1/GetBaseInfo",
+      "UpstreamHttpMethod": [ "GET" ],
+      "ServiceName": "coredata",
+      "LoadBalancer": "LeastConnection",
+      "UseServiceDiscovery": true
+    }
+
+  ],
+  "Aggregates": [
+    {
+      "ReRouteKeys": [
+        "sex",
+        "age"
+      ],
+      "UpstreamPathTemplate": "/getuserinfo"
+    }
+  ],
+
+  "GlobalConfiguration": {
+    "RateLimitOptions": {
+      "DisableRateLimitHeaders": false, // This value specifies whether X-Rate-Limit and Rety-After headers are disabled.
+      "QuotaExceededMessage": "Customize Tips!", // This value specifies the exceeded message.
+      "HttpStatusCode": 999 // This value specifies the returned HTTP Status code when rate limiting occurs.
+    },
+    //"BaseUrl": "http://localhost:54011",
+    "ServiceDiscoveryProvider": {
+      "Host": "192.168.79.60",
+      "Port": 8500,
+      "Type": "Consul"
+    }
+  }
+
+}
